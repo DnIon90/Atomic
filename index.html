@@ -1,45 +1,79 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-  <meta charset="UTF-8">
-  <title>TV Live România</title>
+  <meta charset="utf-8" />
+  <title>Disney Channel România — (exemplu legal)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    body {
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: #111;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-    h1 { margin: 20px; }
-    video {
-      width: 80%;
-      max-width: 800px;
-      border: 3px solid #444;
-      border-radius: 8px;
-      background: black;
-    }
+    body { font-family: Arial, sans-serif; background:#0b1220; color:#f2f2f2; margin:0; padding:20px; display:flex; flex-direction:column; align-items:center; }
+    .card { width:100%; max-width:900px; background: rgba(255,255,255,0.03); padding:18px; border-radius:10px; box-shadow:0 8px 30px rgba(0,0,0,0.6); }
+    h1 { margin:0 0 12px 0; font-size:20px; }
+    .note { font-size:13px; color:#c7d0e0; margin-bottom:12px; }
+    iframe, video { width:100%; height:500px; border:0; border-radius:8px; background:black; }
+    .links { margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; }
+    .btn { padding:10px 14px; border-radius:8px; background:#ffcc00; color:#111; font-weight:700; text-decoration:none; }
+    .btn.ghost { background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.06); }
   </style>
 </head>
 <body>
-  <h1>TV Live România</h1>
+  <div class="card">
+    <h1>Disney Channel România — Player legal (șablon)</h1>
 
-  <!-- Exemplu YouTube TVR Live -->
-  <iframe width="800" height="450"
-    src="https://www.youtube.com/embed/live_stream?channel=UCx3zuu8dU2Uu6B7-9z4iLHw"
-    title="TVR Live"
-    frameborder="0"
-    allowfullscreen>
-  </iframe>
+    <div class="note">
+      Atenție: pentru a reda un canal TV online trebuie să ai permisiunea/fluxul oficial. Nu folosi sau încorpora streamuri piratate. 
+      Mai jos sunt opțiuni legale:
+    </div>
 
-  <br><br>
+    <!-- 1) Embed YouTube Live (doar dacă există stream oficial).
+         Înlocuiește YOUTUBE_CHANNEL_OR_VIDEO cu ID-ul canalului sau al videoclipului live oficial. -->
+    <h3>Embed YouTube (dacă există stream oficial)</h3>
+    <div style="margin-bottom:12px;">
+      <!-- Exemplu: embed canal live -> replace the src with a real official channel ID or video ID -->
+      <iframe
+        src="https://www.youtube.com/embed/live_stream?channel=YOUTUBE_CHANNEL_OR_VIDEO"
+        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+      </iframe>
+    </div>
 
-  <!-- Exemplu flux HLS (doar dacă ai un link .m3u8 valid și liber) -->
-  <video id="player" controls autoplay>
-    <source src="https://example.com/stream.m3u8" type="application/x-mpegURL">
-    Browserul tău nu suportă video live.
-  </video>
+    <!-- 2) Player HLS (doar dacă ai un link .m3u8 oficial)
+         Înlocuiește https://example.com/stream.m3u8 cu linkul tău licențiat. -->
+    <h3>Player HLS (dacă ai un .m3u8 oficial)</h3>
+    <div style="margin-bottom:12px;">
+      <!-- Browserele moderne nu pot reda HLS nativ în toate browserele; recomand hls.js pentru compatibilitate -->
+      <video id="hlsPlayer" controls>
+        <source src="https://example.com/stream.m3u8" type="application/x-mpegURL" />
+        Browserul tău nu suportă redarea directă HLS.
+      </video>
+      <script>
+        // folosește hls.js doar dacă ai nevoie de compatibilitate wider (desktop/mobile)
+        // include hls.js din CDN doar dacă folosești un stream oficial .m3u8
+        (function(){
+          const src = "https://example.com/stream.m3u8"; // înlocuiește cu sursa ta oficială
+          if(!src || src.includes("example.com")) return; // nu încărcăm hls.js pentru placeholder
+          if(Hls && Hls.isSupported()){
+            const hls = new Hls();
+            hls.loadSource(src);
+            hls.attachMedia(document.getElementById('hlsPlayer'));
+          }
+        })();
+      </script>
+    </div>
+
+    <!-- 3) Link direct către Disney+ sau site oficial -->
+    <div class="links">
+      <a class="btn" href="https://www.disneyplus.com" target="_blank" rel="noopener">Mergi la Disney+</a>
+      <a class="btn ghost" href="https://www.disney.ro" target="_blank" rel="noopener">Site oficial Disney România</a>
+    </div>
+
+    <p style="margin-top:14px; font-size:13px; color:#c7d0e0;">
+      Dacă dorești, pot:
+      <ul style="margin:6px 0 0 18px; color:#c7d0e0;">
+        <li>căuta canale YouTube oficiale (dacă vrei să încorporezi live oficial) — tu îmi spui să caut;</li>
+        <li>crea o pagină cu mai multe canale legale YouTube / linkuri către servicii cu licență;</li>
+        <li>adăuga hls.js CDN și cod pentru a reda .m3u8 (doar cu linkuri licențiate).</li>
+      </ul>
+    </p>
+  </div>
 </body>
 </html>
