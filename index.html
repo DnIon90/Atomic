@@ -1,218 +1,109 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Radio + Timp online</title>
+  <meta charset="UTF-8">
+  <title>Demo Site</title>
   <style>
-    :root{
-      --bg:#0f1720; --card:#131922; --accent:#ffcc33; --muted:#9aa3b2;
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #0d1117;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
     }
-    html,body{height:100%; margin:0; font-family:Inter,Arial,Helvetica,sans-serif; background:linear-gradient(180deg,#071027,#0f1720); color:#eaf2ff;}
-    .wrap{max-width:950px; margin:28px auto; padding:18px;}
-    .card{background:var(--card); border-radius:12px; padding:14px; box-shadow:0 10px 30px rgba(0,0,0,0.6);}
-    header{display:flex; justify-content:space-between; align-items:center; gap:12px;}
-    h1{margin:0; font-size:20px;}
-    .row{display:flex; gap:12px; align-items:center; flex-wrap:wrap;}
-    .player { margin-top:14px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-    audio { width:420px; max-width:100%; border-radius:8px; background:#000; }
-    .stats { display:flex; gap:12px; flex-direction:column; min-width:240px; }
-    .big { font-size:20px; font-weight:700; color:var(--accent); }
-    .muted { color:var(--muted); font-size:13px; }
-    .counter { display:flex; gap:8px; align-items:center; margin-top:8px; }
-    button { background:var(--accent); color:#111; padding:8px 12px; border-radius:8px; border:0; font-weight:700; cursor:pointer; }
-    button.ghost { background:transparent; color:#eaf2ff; border:1px solid rgba(255,255,255,0.04); }
-    footer { margin-top:16px; color:var(--muted); font-size:13px; text-align:center; }
-    @media (max-width:700px){ header{flex-direction:column; align-items:flex-start;} .player{flex-direction:column; align-items:flex-start;} .stats{min-width:unset;} }
+    h1 {
+      margin-bottom: 10px;
+    }
+    audio {
+      margin: 20px 0;
+      width: 300px;
+    }
+    #clock, #uptime, #counter {
+      margin: 15px 0;
+      font-size: 20px;
+    }
+    button {
+      margin: 5px;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .plus { background: #00c853; color: white; }
+    .reset { background: #e53935; color: white; }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1>Radio Demo + Timp online (fără resetare)</h1>
-      <div class="muted">Exemplu: pune fluxul tău legal în audio src</div>
-    </header>
+  <h1>Bun venit pe site!</h1>
+  <p>Aici avem radio + ceas + calculator de socotit.</p>
 
-    <div class="card" style="margin-top:12px;">
-      <div class="row">
-        <!-- Player -->
-        <div style="flex:1">
-          <div style="font-size:14px; color:#dbe9ff; margin-bottom:8px;"><strong>Player Radio</strong></div>
+  <!-- 🎵 Radio -->
+  <h2>Radio Live</h2>
+  <audio controls>
+    <!-- Pune aici fluxul tău audio -->
+    <source src="https://example.com/stream.mp3" type="audio/mpeg">
+    Browserul tău nu suportă audio.
+  </audio>
 
-          <!-- Înlocuiește src cu fluxul tău legal (.mp3 / .m3u8) -->
-          <div class="player">
-            <audio id="radioPlayer" controls preload="none">
-              <source src="https://example.com/stream.mp3" type="audio/mpeg">
-              Browserul tău nu suportă acest player.
-            </audio>
+  <!-- 🕒 Ceas -->
+  <div id="clock"></div>
 
-            <div style="display:flex; flex-direction:column; gap:6px;">
-              <div class="muted">Status player: <span id="playerStatus">Oprit</span></div>
-              <div class="muted">Titlu stream: <span id="streamTitle">Nedefinit</span></div>
-            </div>
-          </div>
+  <!-- ⏱️ Timp online -->
+  <div id="uptime"></div>
 
-          <div style="margin-top:10px;" class="muted">
-            Notă: folosește doar fluxuri pe care ai dreptul să le difuzezi.
-          </div>
-        </div>
-
-        <!-- Stats / Uptime / Counter -->
-        <aside class="stats card" style="padding:12px;">
-          <div>
-            <div class="muted">Timp global de când site-ul este online</div>
-            <div id="globalUptime" class="big">0 zile 0h 0m 0s</div>
-            <div class="muted" style="font-size:12px;">(data de start setată în cod)</div>
-          </div>
-
-          <div style="margin-top:10px;">
-            <div class="muted">Timpul tău de vizită (salvat local — nu se resetează la refresh)</div>
-            <div id="visitorUptime" class="big">0 zile 0h 0m 0s</div>
-            <div class="muted" style="font-size:12px;">Prima vizită salvată în localStorage</div>
-          </div>
-
-          <div style="margin-top:10px;">
-            <div class="muted">Calculator de socotit (contor persist)</div>
-            <div class="counter">
-              <div class="big" id="clickCounter">0</div>
-              <div style="display:flex; flex-direction:column;">
-                <button id="btnAdd">+1</button>
-                <button id="btnAdd10" class="ghost" style="margin-top:8px;">+10</button>
-              </div>
-            </div>
-            <div style="margin-top:8px;">
-              <button id="btnClear" class="ghost">Resetează contor (confirm)</button>
-            </div>
-          </div>
-        </aside>
-      </div>
-    </div>
-
-    <footer>
-      Exemplu creat pentru GitHub Pages • Înlocuiește <code>https://example.com/stream.mp3</code> cu fluxul tău legal.
-    </footer>
-  </div>
+  <!-- 🔢 Calculator de socotit -->
+  <div id="counter">Contor: 0</div>
+  <button class="plus" onclick="addCount(1)">+1</button>
+  <button class="plus" onclick="addCount(10)">+10</button>
+  <button class="reset" onclick="resetCount()">Resetează</button>
 
   <script>
-    /*****************************************
-     * Configurații (editează după nevoie)
-     *****************************************/
-    // Data globală de start (timpul global NU se resetează)
-    // Folosește format ISO: YYYY-MM-DDTHH:mm:ss (UTC sau local)
-    const GLOBAL_START_ISO = "2025-09-27T00:00:00"; // → modifică aici data de lansare globală
+    // Ceas live
+    function updateClock() {
+      const now = new Date();
+      document.getElementById("clock").innerText =
+        "Ora curentă: " + now.toLocaleTimeString();
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
 
-    // Cheile folosite în localStorage (nu se resetează automat)
-    const KEY_VISITOR_START = "radio_visitor_first_visit";
-    const KEY_COUNTER = "radio_click_counter";
-
-    /*****************************************
-     * Player radio (doar UI simplu)
-     *****************************************/
-    const player = document.getElementById("radioPlayer");
-    const playerStatus = document.getElementById("playerStatus");
-    const streamTitle = document.getElementById("streamTitle");
-
-    // Dacă vrei poți schimba titlul afișat aici (sau obține din metadate)
-    streamTitle.innerText = "Radio Demo";
-
-    player.addEventListener("play", () => { playerStatus.innerText = "Redare"; });
-    player.addEventListener("pause", () => { playerStatus.innerText = "Oprit"; });
-    player.addEventListener("ended", () => { playerStatus.innerText = "S-a terminat"; });
-
-    /*****************************************
-     * Uptime global (nu se resetează)
-     *****************************************/
-    const globalElem = document.getElementById("globalUptime");
-    const startDateGlobal = new Date(GLOBAL_START_ISO);
-
-    function formatDiff(sec){
-      if(sec < 0) sec = 0;
+    // Timp online global (setat din cod, nu se resetează)
+    const startDate = new Date("2025-09-27T00:00:00"); // modifică data de lansare
+    function updateUptime() {
+      const now = new Date();
+      let sec = Math.floor((now - startDate) / 1000);
       const zile = Math.floor(sec / 86400);
-      const ore = Math.floor((sec % 86400) / 3600);
-      const min = Math.floor((sec % 3600) / 60);
+      sec %= 86400;
+      const ore = Math.floor(sec / 3600);
+      sec %= 3600;
+      const min = Math.floor(sec / 60);
       const s = sec % 60;
-      return `${zile} zile ${ore}h ${min}m ${s}s`;
+      document.getElementById("uptime").innerText =
+        `Site online de ${zile} zile ${ore}h ${min}m ${s}s`;
     }
+    setInterval(updateUptime, 1000);
+    updateUptime();
 
-    function updateGlobalUptime(){
-      const now = new Date();
-      let diff = Math.floor((now - startDateGlobal) / 1000);
-      globalElem.innerText = formatDiff(diff);
+    // Calculator de socotit (persistă în localStorage)
+    let count = parseInt(localStorage.getItem("myCounter") || "0");
+    function refreshCounter() {
+      document.getElementById("counter").innerText = "Contor: " + count;
     }
-
-    /*****************************************
-     * Uptime per vizitator (salvat local)
-     *****************************************/
-    const visitorElem = document.getElementById("visitorUptime");
-
-    function ensureVisitorStart(){
-      let vs = localStorage.getItem(KEY_VISITOR_START);
-      if(!vs){
-        // salvează momentul primei vizite
-        const iso = new Date().toISOString();
-        localStorage.setItem(KEY_VISITOR_START, iso);
-        vs = iso;
+    function addCount(x) {
+      count += x;
+      localStorage.setItem("myCounter", count);
+      refreshCounter();
+    }
+    function resetCount() {
+      if (confirm("Resetezi contorul?")) {
+        count = 0;
+        localStorage.setItem("myCounter", count);
+        refreshCounter();
       }
-      return new Date(vs);
     }
-
-    function updateVisitorUptime(){
-      const start = ensureVisitorStart();
-      const now = new Date();
-      let diff = Math.floor((now - start) / 1000);
-      visitorElem.innerText = formatDiff(diff);
-    }
-
-    /*****************************************
-     * Calculator de socotit (persist în localStorage)
-     *****************************************/
-    const counterEl = document.getElementById("clickCounter");
-    const btnAdd = document.getElementById("btnAdd");
-    const btnAdd10 = document.getElementById("btnAdd10");
-    const btnClear = document.getElementById("btnClear");
-
-    function loadCounter(){ return parseInt(localStorage.getItem(KEY_COUNTER) || "0", 10); }
-    function saveCounter(v){ localStorage.setItem(KEY_COUNTER, String(v)); counterEl.innerText = v; }
-
-    btnAdd.addEventListener("click", ()=>{
-      let v = loadCounter();
-      v += 1;
-      saveCounter(v);
-    });
-
-    btnAdd10.addEventListener("click", ()=>{
-      let v = loadCounter();
-      v += 10;
-      saveCounter(v);
-    });
-
-    btnClear.addEventListener("click", ()=>{
-      if(confirm("Resetezi contorul? Aceasta va șterge valoarea local. Continuăm?")){
-        saveCounter(0);
-      }
-    });
-
-    // initialize counter on load
-    saveCounter(loadCounter());
-
-    /*****************************************
-     * Loop principal: actualizează afișările
-     *****************************************/
-    function tick(){
-      updateGlobalUptime();
-      updateVisitorUptime();
-      // rulează la fiecare secundă
-      setTimeout(tick, 1000);
-    }
-    // pornim
-    tick();
-
-    /*****************************************
-     * Sugestii / note
-     *****************************************/
-    // 1) Dacă vrei timp global ajustat pentru fus orar, setează GLOBAL_START_ISO la timpul corect (ex: ora locale).
-    // 2) Dacă ai un flux HLS (.m3u8) și vrei compatibilitate, integrează hls.js (CDN) și încarcă sursa via Hls() când este suportat.
-    // 3) LocalStorage e per-browser/per-device — pentru contorizare globală reală ai nevoie de backend (server).
+    refreshCounter();
   </script>
 </body>
 </html>
