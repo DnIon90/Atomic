@@ -2,94 +2,140 @@
 <html lang="ro">
 <head>
   <meta charset="UTF-8">
-  <title>Mini Joc</title>
+  <title>Joc cu Mașini</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
       margin: 0;
-      padding: 0;
-      background: #f0f0f0;
-      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #222;
+      font-family: Arial, sans-serif;
+      color: #fff;
     }
     #gameArea {
-      width: 100vw;
-      height: 100vh;
       position: relative;
-      background: #dff0ff;
+      width: 400px;
+      height: 600px;
+      background: #333;
+      overflow: hidden;
+      border: 4px solid #555;
     }
-    #target {
-      width: 80px;
-      height: 80px;
-      background: red;
-      border-radius: 50%;
+    #car {
       position: absolute;
-      cursor: pointer;
+      bottom: 20px;
+      left: 180px;
+      width: 40px;
+      height: 70px;
+      background: limegreen;
+      border-radius: 6px;
     }
-    #scoreboard {
+    .obstacle {
+      position: absolute;
+      top: -100px;
+      width: 40px;
+      height: 70px;
+      background: red;
+      border-radius: 6px;
+    }
+    #score {
       position: absolute;
       top: 10px;
       left: 10px;
       font-size: 20px;
-      background: white;
-      padding: 8px 15px;
-      border-radius: 8px;
     }
     #gameOver {
-      display: none;
       position: absolute;
-      top: 40%;
+      top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 32px;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      border: 2px solid black;
+      font-size: 28px;
+      display: none;
     }
   </style>
 </head>
 <body>
   <div id="gameArea">
-    <div id="scoreboard">Scor: 0 | Timp: 30</div>
-    <div id="target"></div>
+    <div id="car"></div>
+    <div id="score">Scor: 0</div>
     <div id="gameOver"></div>
   </div>
 
   <script>
+    const gameArea = document.getElementById("gameArea");
+    const car = document.getElementById("car");
+    const scoreEl = document.getElementById("score");
+    const gameOverEl = document.getElementById("gameOver");
+
+    let carX = 180;
+    let speed = 5;
     let score = 0;
-    let timeLeft = 30;
-    const target = document.getElementById("target");
-    const scoreboard = document.getElementById("scoreboard");
-    const gameOver = document.getElementById("gameOver");
+    let playing = true;
+    let obstacles = [];
 
-    // mută ținta random
-    function moveTarget() {
-      const x = Math.random() * (window.innerWidth - 100);
-      const y = Math.random() * (window.innerHeight - 100);
-      target.style.left = x + "px";
-      target.style.top = y + "px";
-    }
-
-    // click pe țintă = punct
-    target.addEventListener("click", () => {
-      score++;
-      scoreboard.innerText = `Scor: ${score} | Timp: ${timeLeft}`;
-      moveTarget();
+    // mișcarea mașinii
+    window.addEventListener("keydown", (e) => {
+      if (!playing) return;
+      if (e.key === "ArrowLeft" && carX > 0) {
+        carX -= 20;
+      } else if (e.key === "ArrowRight" && carX < 360) {
+        carX += 20;
+      }
+      car.style.left = carX + "px";
     });
 
-    // start joc
-    moveTarget();
-    const timer = setInterval(() => {
-      timeLeft--;
-      scoreboard.innerText = `Scor: ${score} | Timp: ${timeLeft}`;
-      if (timeLeft <= 0) {
-        clearInterval(timer);
-        target.style.display = "none";
-        gameOver.style.display = "block";
-        gameOver.innerText = `Joc Terminat!\nScor final: ${score}`;
-      }
-    }, 1000);
+    // creează obstacole
+    function createObstacle() {
+      if (!playing) return;
+      const obs = document.createElement("div");
+      obs.classList.add("obstacle");
+      obs.style.left = Math.floor(Math.random() * 10) * 40 + "px"; // poziții multiple
+      obs.style.top = "-70px";
+      gameArea.appendChild(obs);
+      obstacles.push(obs);
+    }
+
+    // actualizează jocul
+    function update() {
+      if (!playing) return;
+
+      // mută obstacole
+      obstacles.forEach((obs, index) => {
+        let top = parseInt(obs.style.top) || -70;
+        obs.style.top = top + speed + "px";
+
+        // coliziune
+        if (
+          top + 70 > 530 &&
+          parseInt(obs.style.left) === carX
+        ) {
+          endGame();
+        }
+
+        // elimină obstacolul
+        if (top > 600) {
+          obs.remove();
+          obstacles.splice(index, 1);
+          score++;
+          scoreEl.innerText = "Scor: " + score;
+          if (score % 5 === 0) speed++; // crește viteza
+        }
+      });
+
+      requestAnimationFrame(update);
+    }
+
+    // termină jocul
+    function endGame() {
+      playing = false;
+      gameOverEl.style.display = "block";
+      gameOverEl.innerText = "Game Over!\nScor final: " + score;
+    }
+
+    // începe jocul
+    setInterval(createObstacle, 1500);
+    update();
   </script>
 </body>
 </html>
