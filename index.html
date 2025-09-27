@@ -2,125 +2,32 @@
 <html lang="ro">
 <head>
   <meta charset="UTF-8">
-  <title>Site Multicolor</title>
+  <title>Ceas Online</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
       margin: 0;
-      padding: 20px;
-      background: linear-gradient(135deg, #ff00cc, #3333ff, #00ffcc, #ff9900);
-      background-size: 400% 400%;
-      animation: gradientBG 12s ease infinite;
-      color: #fff;
+      background: #111;
+      color: #00ffcc;
+      font-family: monospace;
+      font-size: 60px;
     }
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    h1 {
-      margin-bottom: 10px;
-      text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-    }
-    audio {
-      margin: 20px 0;
-      width: 300px;
-      border: 3px solid #fff;
-      border-radius: 8px;
-    }
-    #clock, #uptime, #counter {
-      margin: 15px 0;
-      font-size: 22px;
-      font-weight: bold;
-      color: #ffeb3b;
-      text-shadow: 1px 1px 3px black;
-    }
-    button {
-      margin: 6px;
-      padding: 10px 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-      color: white;
-      transition: transform 0.2s;
-    }
-    button:hover { transform: scale(1.1); }
-    .plus { background: #4caf50; }
-    .plus10 { background: #2196f3; }
-    .reset { background: #e91e63; }
   </style>
 </head>
 <body>
-  <h1>🌈 Site Multicolor</h1>
-  <p>Radio + Ceas + Timp online + Contor</p>
-
-  <!-- 🎵 Radio -->
-  <h2>📻 Radio Live</h2>
-  <audio controls>
-    <!-- Pune aici fluxul tău audio -->
-    <source src="https://example.com/stream.mp3" type="audio/mpeg">
-    Browserul tău nu suportă audio.
-  </audio>
-
-  <!-- 🕒 Ceas -->
   <div id="clock"></div>
 
-  <!-- ⏱️ Timp online -->
-  <div id="uptime"></div>
-
-  <!-- 🔢 Contor -->
-  <div id="counter">Contor: 0</div>
-  <button class="plus" onclick="addCount(1)">+1</button>
-  <button class="plus10" onclick="addCount(10)">+10</button>
-  <button class="reset" onclick="resetCount()">Resetează</button>
-
   <script>
-    // Ceas live
     function updateClock() {
       const now = new Date();
-      document.getElementById("clock").innerText =
-        "Ora curentă: " + now.toLocaleTimeString();
+      document.getElementById("clock").textContent =
+        now.toLocaleTimeString();
     }
     setInterval(updateClock, 1000);
     updateClock();
-
-    // Timp online global (nu se resetează, setat la o dată fixă)
-    const startDate = new Date("2025-09-27T00:00:00"); // schimbă data de lansare
-    function updateUptime() {
-      const now = new Date();
-      let sec = Math.floor((now - startDate) / 1000);
-      const zile = Math.floor(sec / 86400);
-      sec %= 86400;
-      const ore = Math.floor(sec / 3600);
-      sec %= 3600;
-      const min = Math.floor(sec / 60);
-      const s = sec % 60;
-      document.getElementById("uptime").innerText =
-        `⏱️ Site online de ${zile} zile ${ore}h ${min}m ${s}s`;
-    }
-    setInterval(updateUptime, 1000);
-    updateUptime();
-
-    // Contor simplu (salvat în localStorage)
-    let count = parseInt(localStorage.getItem("myCounter") || "0");
-    function refreshCounter() {
-      document.getElementById("counter").innerText = "Contor: " + count;
-    }
-    function addCount(x) {
-      count += x;
-      localStorage.setItem("myCounter", count);
-      refreshCounter();
-    }
-    function resetCount() {
-      if (confirm("Resetezi contorul?")) {
-        count = 0;
-        localStorage.setItem("myCounter", count);
-        refreshCounter();
-      }
-    }
-    refreshCounter();
   </script>
 </body>
 </html>
