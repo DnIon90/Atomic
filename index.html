@@ -1,55 +1,87 @@
-
-
 <!DOCTYPE html>
 <html lang="ro">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Site creat de Dn_Ion</title>
+  <title>Login - Site GitHub Pages</title>
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       text-align: center;
+      background: linear-gradient(135deg, #0b74ea, #0366d6);
       color: white;
-      background: linear-gradient(135deg, #ff416c, #ff4b2b, #1d2b64, #f8cdda);
-      background-size: 400% 400%;
-      animation: gradientBG 12s ease infinite;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    .login-box {
+      background: rgba(255,255,255,0.1);
+      padding: 30px;
+      border-radius: 12px;
+      width: 300px;
     }
-    h1 {
-      margin-top: 50px;
-      font-size: 3rem;
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
     }
-    p {
-      font-size: 1.3rem;
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #004aad;
+      border: none;
+      color: white;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
     }
-    .box {
-      margin: 50px auto;
-      padding: 20px;
-      max-width: 600px;
-      background: rgba(0,0,0,0.5);
-      border-radius: 10px;
+    button:hover {
+      background: #00347a;
+    }
+    #content {
+      display: none;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <h1>🌈 Site-ul meu colorattttt!</h1>
-  <div class="box">
-    <p>Bun venit pe prima mea pagină GitHub Pages cu fundal animat și colorat 🎉</p>
+  <div class="login-box" id="loginBox">
+    <h2>🔑 Autentificare</h2>
+    <input type="text" id="username" placeholder="Utilizator"><br>
+    <input type="password" id="password" placeholder="Parolă"><br>
+    <button onclick="login()">Login</button>
+    <p id="error" style="color: red; display:none;">Utilizator sau parolă greșită!</p>
   </div>
+
+  <div id="content">
+    <h1>🎉 Bine ai venit pe site!</h1>
+    <p>Aici e conținutul protejat după login.</p>
+    
+    <h3>🎵 Radio Kiss FM</h3>
+    <audio controls autoplay>
+      <source src="https://live.kissfm.ro/kissfm.aacp" type="audio/aac">
+      Browserul tău nu suportă playerul audio.
+    </audio>
+  </div>
+
+  <script>
+    function login() {
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+      const correctUser = "admin";  // 🔒 Nume utilizator
+      const correctPass = "1234";   // 🔒 Parola
+
+      if (user === correctUser && pass === correctPass) {
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("content").style.display = "block";
+      } else {
+        document.getElementById("error").style.display = "block";
+      }
+    }
+  </script>
 </body>
 </html>
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Salut!</title>
-</head>
-<body>
-    <h1>Merge GitHub Pages 🎉</h1>
-    
