@@ -2,36 +2,87 @@
 <html lang="ro">
 <head>
   <meta charset="UTF-8">
-  <title>WhatsApp Web</title>
+  <title>GPS Browser</title>
   <style>
     body {
+      font-family: Arial, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
       margin: 0;
-      background: #111;
-      font-family: Arial, sans-serif;
+    }
+    .card {
+      background: #161b22;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+      text-align: center;
+      width: 320px;
+    }
+    button {
+      background: #238636;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #2ea043;
     }
     a {
-      display: inline-block;
-      padding: 15px 25px;
-      background: #25D366;
-      color: #fff;
-      font-size: 20px;
+      color: #58a6ff;
       text-decoration: none;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
     a:hover {
-      background: #1EBE57;
+      text-decoration: underline;
+    }
+    .coords {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #9ba3b0;
     }
   </style>
 </head>
 <body>
-  <!-- înlocuiește 40712345678 cu numărul tău -->
-  <a href="https://web.whatsapp.com/send?phone=40712345678&text=Salut!" target="_blank">
-    Deschide WhatsApp Web
-  </a>
+  <div class="card">
+    <h2>📍 Locația ta GPS</h2>
+    <p>Apasă pe buton pentru a obține coordonatele.</p>
+    <button onclick="getLocation()">Află locația</button>
+    <div class="coords" id="output"></div>
+  </div>
+
+  <script>
+    function getLocation() {
+      const output = document.getElementById("output");
+
+      if (!navigator.geolocation) {
+        output.innerHTML = "❌ Browserul tău nu suportă GPS.";
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude.toFixed(6);
+          const lon = pos.coords.longitude.toFixed(6);
+          const link = `https://www.google.com/maps?q=${lat},${lon}`;
+
+          output.innerHTML = `
+            <strong>Latitudine:</strong> ${lat}<br>
+            <strong>Longitudine:</strong> ${lon}<br><br>
+            <a href="${link}" target="_blank">📍 Vezi pe Google Maps</a>
+          `;
+        },
+        (err) => {
+          output.innerHTML = "⚠️ Eroare: " + err.message;
+        }
+      );
+    }
+  </script>
 </body>
 </html>
