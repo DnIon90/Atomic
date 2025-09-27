@@ -2,78 +2,217 @@
 <html lang="ro">
 <head>
   <meta charset="utf-8" />
-  <title>Disney Channel România — (exemplu legal)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Radio + Timp online</title>
   <style>
-    body { font-family: Arial, sans-serif; background:#0b1220; color:#f2f2f2; margin:0; padding:20px; display:flex; flex-direction:column; align-items:center; }
-    .card { width:100%; max-width:900px; background: rgba(255,255,255,0.03); padding:18px; border-radius:10px; box-shadow:0 8px 30px rgba(0,0,0,0.6); }
-    h1 { margin:0 0 12px 0; font-size:20px; }
-    .note { font-size:13px; color:#c7d0e0; margin-bottom:12px; }
-    iframe, video { width:100%; height:500px; border:0; border-radius:8px; background:black; }
-    .links { margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; }
-    .btn { padding:10px 14px; border-radius:8px; background:#ffcc00; color:#111; font-weight:700; text-decoration:none; }
-    .btn.ghost { background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.06); }
+    :root{
+      --bg:#0f1720; --card:#131922; --accent:#ffcc33; --muted:#9aa3b2;
+    }
+    html,body{height:100%; margin:0; font-family:Inter,Arial,Helvetica,sans-serif; background:linear-gradient(180deg,#071027,#0f1720); color:#eaf2ff;}
+    .wrap{max-width:950px; margin:28px auto; padding:18px;}
+    .card{background:var(--card); border-radius:12px; padding:14px; box-shadow:0 10px 30px rgba(0,0,0,0.6);}
+    header{display:flex; justify-content:space-between; align-items:center; gap:12px;}
+    h1{margin:0; font-size:20px;}
+    .row{display:flex; gap:12px; align-items:center; flex-wrap:wrap;}
+    .player { margin-top:14px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    audio { width:420px; max-width:100%; border-radius:8px; background:#000; }
+    .stats { display:flex; gap:12px; flex-direction:column; min-width:240px; }
+    .big { font-size:20px; font-weight:700; color:var(--accent); }
+    .muted { color:var(--muted); font-size:13px; }
+    .counter { display:flex; gap:8px; align-items:center; margin-top:8px; }
+    button { background:var(--accent); color:#111; padding:8px 12px; border-radius:8px; border:0; font-weight:700; cursor:pointer; }
+    button.ghost { background:transparent; color:#eaf2ff; border:1px solid rgba(255,255,255,0.04); }
+    footer { margin-top:16px; color:var(--muted); font-size:13px; text-align:center; }
+    @media (max-width:700px){ header{flex-direction:column; align-items:flex-start;} .player{flex-direction:column; align-items:flex-start;} .stats{min-width:unset;} }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Disney Channel România — Player legal (șablon)</h1>
+  <div class="wrap">
+    <header>
+      <h1>Radio Demo + Timp online (fără resetare)</h1>
+      <div class="muted">Exemplu: pune fluxul tău legal în audio src</div>
+    </header>
 
-    <div class="note">
-      Atenție: pentru a reda un canal TV online trebuie să ai permisiunea/fluxul oficial. Nu folosi sau încorpora streamuri piratate. 
-      Mai jos sunt opțiuni legale:
+    <div class="card" style="margin-top:12px;">
+      <div class="row">
+        <!-- Player -->
+        <div style="flex:1">
+          <div style="font-size:14px; color:#dbe9ff; margin-bottom:8px;"><strong>Player Radio</strong></div>
+
+          <!-- Înlocuiește src cu fluxul tău legal (.mp3 / .m3u8) -->
+          <div class="player">
+            <audio id="radioPlayer" controls preload="none">
+              <source src="https://example.com/stream.mp3" type="audio/mpeg">
+              Browserul tău nu suportă acest player.
+            </audio>
+
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <div class="muted">Status player: <span id="playerStatus">Oprit</span></div>
+              <div class="muted">Titlu stream: <span id="streamTitle">Nedefinit</span></div>
+            </div>
+          </div>
+
+          <div style="margin-top:10px;" class="muted">
+            Notă: folosește doar fluxuri pe care ai dreptul să le difuzezi.
+          </div>
+        </div>
+
+        <!-- Stats / Uptime / Counter -->
+        <aside class="stats card" style="padding:12px;">
+          <div>
+            <div class="muted">Timp global de când site-ul este online</div>
+            <div id="globalUptime" class="big">0 zile 0h 0m 0s</div>
+            <div class="muted" style="font-size:12px;">(data de start setată în cod)</div>
+          </div>
+
+          <div style="margin-top:10px;">
+            <div class="muted">Timpul tău de vizită (salvat local — nu se resetează la refresh)</div>
+            <div id="visitorUptime" class="big">0 zile 0h 0m 0s</div>
+            <div class="muted" style="font-size:12px;">Prima vizită salvată în localStorage</div>
+          </div>
+
+          <div style="margin-top:10px;">
+            <div class="muted">Calculator de socotit (contor persist)</div>
+            <div class="counter">
+              <div class="big" id="clickCounter">0</div>
+              <div style="display:flex; flex-direction:column;">
+                <button id="btnAdd">+1</button>
+                <button id="btnAdd10" class="ghost" style="margin-top:8px;">+10</button>
+              </div>
+            </div>
+            <div style="margin-top:8px;">
+              <button id="btnClear" class="ghost">Resetează contor (confirm)</button>
+            </div>
+          </div>
+        </aside>
+      </div>
     </div>
 
-    <!-- 1) Embed YouTube Live (doar dacă există stream oficial).
-         Înlocuiește YOUTUBE_CHANNEL_OR_VIDEO cu ID-ul canalului sau al videoclipului live oficial. -->
-    <h3>Embed YouTube (dacă există stream oficial)</h3>
-    <div style="margin-bottom:12px;">
-      <!-- Exemplu: embed canal live -> replace the src with a real official channel ID or video ID -->
-      <iframe
-        src="https://www.youtube.com/embed/live_stream?channel=YOUTUBE_CHANNEL_OR_VIDEO"
-        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen>
-      </iframe>
-    </div>
-
-    <!-- 2) Player HLS (doar dacă ai un link .m3u8 oficial)
-         Înlocuiește https://example.com/stream.m3u8 cu linkul tău licențiat. -->
-    <h3>Player HLS (dacă ai un .m3u8 oficial)</h3>
-    <div style="margin-bottom:12px;">
-      <!-- Browserele moderne nu pot reda HLS nativ în toate browserele; recomand hls.js pentru compatibilitate -->
-      <video id="hlsPlayer" controls>
-        <source src="https://example.com/stream.m3u8" type="application/x-mpegURL" />
-        Browserul tău nu suportă redarea directă HLS.
-      </video>
-      <script>
-        // folosește hls.js doar dacă ai nevoie de compatibilitate wider (desktop/mobile)
-        // include hls.js din CDN doar dacă folosești un stream oficial .m3u8
-        (function(){
-          const src = "https://example.com/stream.m3u8"; // înlocuiește cu sursa ta oficială
-          if(!src || src.includes("example.com")) return; // nu încărcăm hls.js pentru placeholder
-          if(Hls && Hls.isSupported()){
-            const hls = new Hls();
-            hls.loadSource(src);
-            hls.attachMedia(document.getElementById('hlsPlayer'));
-          }
-        })();
-      </script>
-    </div>
-
-    <!-- 3) Link direct către Disney+ sau site oficial -->
-    <div class="links">
-      <a class="btn" href="https://www.disneyplus.com" target="_blank" rel="noopener">Mergi la Disney+</a>
-      <a class="btn ghost" href="https://www.disney.ro" target="_blank" rel="noopener">Site oficial Disney România</a>
-    </div>
-
-    <p style="margin-top:14px; font-size:13px; color:#c7d0e0;">
-      Dacă dorești, pot:
-      <ul style="margin:6px 0 0 18px; color:#c7d0e0;">
-        <li>căuta canale YouTube oficiale (dacă vrei să încorporezi live oficial) — tu îmi spui să caut;</li>
-        <li>crea o pagină cu mai multe canale legale YouTube / linkuri către servicii cu licență;</li>
-        <li>adăuga hls.js CDN și cod pentru a reda .m3u8 (doar cu linkuri licențiate).</li>
-      </ul>
-    </p>
+    <footer>
+      Exemplu creat pentru GitHub Pages • Înlocuiește <code>https://example.com/stream.mp3</code> cu fluxul tău legal.
+    </footer>
   </div>
+
+  <script>
+    /*****************************************
+     * Configurații (editează după nevoie)
+     *****************************************/
+    // Data globală de start (timpul global NU se resetează)
+    // Folosește format ISO: YYYY-MM-DDTHH:mm:ss (UTC sau local)
+    const GLOBAL_START_ISO = "2025-09-27T00:00:00"; // → modifică aici data de lansare globală
+
+    // Cheile folosite în localStorage (nu se resetează automat)
+    const KEY_VISITOR_START = "radio_visitor_first_visit";
+    const KEY_COUNTER = "radio_click_counter";
+
+    /*****************************************
+     * Player radio (doar UI simplu)
+     *****************************************/
+    const player = document.getElementById("radioPlayer");
+    const playerStatus = document.getElementById("playerStatus");
+    const streamTitle = document.getElementById("streamTitle");
+
+    // Dacă vrei poți schimba titlul afișat aici (sau obține din metadate)
+    streamTitle.innerText = "Radio Demo";
+
+    player.addEventListener("play", () => { playerStatus.innerText = "Redare"; });
+    player.addEventListener("pause", () => { playerStatus.innerText = "Oprit"; });
+    player.addEventListener("ended", () => { playerStatus.innerText = "S-a terminat"; });
+
+    /*****************************************
+     * Uptime global (nu se resetează)
+     *****************************************/
+    const globalElem = document.getElementById("globalUptime");
+    const startDateGlobal = new Date(GLOBAL_START_ISO);
+
+    function formatDiff(sec){
+      if(sec < 0) sec = 0;
+      const zile = Math.floor(sec / 86400);
+      const ore = Math.floor((sec % 86400) / 3600);
+      const min = Math.floor((sec % 3600) / 60);
+      const s = sec % 60;
+      return `${zile} zile ${ore}h ${min}m ${s}s`;
+    }
+
+    function updateGlobalUptime(){
+      const now = new Date();
+      let diff = Math.floor((now - startDateGlobal) / 1000);
+      globalElem.innerText = formatDiff(diff);
+    }
+
+    /*****************************************
+     * Uptime per vizitator (salvat local)
+     *****************************************/
+    const visitorElem = document.getElementById("visitorUptime");
+
+    function ensureVisitorStart(){
+      let vs = localStorage.getItem(KEY_VISITOR_START);
+      if(!vs){
+        // salvează momentul primei vizite
+        const iso = new Date().toISOString();
+        localStorage.setItem(KEY_VISITOR_START, iso);
+        vs = iso;
+      }
+      return new Date(vs);
+    }
+
+    function updateVisitorUptime(){
+      const start = ensureVisitorStart();
+      const now = new Date();
+      let diff = Math.floor((now - start) / 1000);
+      visitorElem.innerText = formatDiff(diff);
+    }
+
+    /*****************************************
+     * Calculator de socotit (persist în localStorage)
+     *****************************************/
+    const counterEl = document.getElementById("clickCounter");
+    const btnAdd = document.getElementById("btnAdd");
+    const btnAdd10 = document.getElementById("btnAdd10");
+    const btnClear = document.getElementById("btnClear");
+
+    function loadCounter(){ return parseInt(localStorage.getItem(KEY_COUNTER) || "0", 10); }
+    function saveCounter(v){ localStorage.setItem(KEY_COUNTER, String(v)); counterEl.innerText = v; }
+
+    btnAdd.addEventListener("click", ()=>{
+      let v = loadCounter();
+      v += 1;
+      saveCounter(v);
+    });
+
+    btnAdd10.addEventListener("click", ()=>{
+      let v = loadCounter();
+      v += 10;
+      saveCounter(v);
+    });
+
+    btnClear.addEventListener("click", ()=>{
+      if(confirm("Resetezi contorul? Aceasta va șterge valoarea local. Continuăm?")){
+        saveCounter(0);
+      }
+    });
+
+    // initialize counter on load
+    saveCounter(loadCounter());
+
+    /*****************************************
+     * Loop principal: actualizează afișările
+     *****************************************/
+    function tick(){
+      updateGlobalUptime();
+      updateVisitorUptime();
+      // rulează la fiecare secundă
+      setTimeout(tick, 1000);
+    }
+    // pornim
+    tick();
+
+    /*****************************************
+     * Sugestii / note
+     *****************************************/
+    // 1) Dacă vrei timp global ajustat pentru fus orar, setează GLOBAL_START_ISO la timpul corect (ex: ora locale).
+    // 2) Dacă ai un flux HLS (.m3u8) și vrei compatibilitate, integrează hls.js (CDN) și încarcă sursa via Hls() când este suportat.
+    // 3) LocalStorage e per-browser/per-device — pentru contorizare globală reală ai nevoie de backend (server).
+  </script>
 </body>
 </html>
