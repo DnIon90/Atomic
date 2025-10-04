@@ -1,44 +1,215 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-  <meta charset="UTF-8">
-  <title>Pagina Multicolor</title>
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: Arial, sans-serif;
-      color: #fff;
-      background: linear-gradient(45deg, #ff0000, #ff9900, #00ffcc, #3333ff);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
-      text-align: center;
-    }
-
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    h1 {
-      font-size: 48px;
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
-    }
-
-    p {
-      font-size: 20px;
-      text-shadow: 1px 1px 5px rgba(0,0,0,0.4);
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mini-Forum Local</title>
+<style>
+body{font-family:Arial,sans-serif;max-width:900px;margin:20px auto;background:#f5f5f5;padding:15px;}
+h1{color:#007bff;margin-bottom:10px;}
+input,textarea,button{padding:8px;border-radius:5px;border:1px solid #ccc;font-size:14px;}
+button{background:#007bff;color:#fff;border:0;cursor:pointer;}
+button:hover{background:#0056b3;}
+.thread{background:#fff;padding:10px;border-radius:6px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.1);}
+.thread .controls a{margin-right:10px;cursor:pointer;color:#007bff;text-decoration:none;font-size:13px;}
+.thread .controls a:hover{text-decoration:underline;}
+#login-area,#forum-area{margin-bottom:20px;}
+.muted{color:#666;font-size:13px;}
+</style>
 </head>
 <body>
-  <div>
-    <h1>🌈 Bine ai venit!</h1>
-    <p>Aceasta este o pagină simplă multicoloră.</p>
+<h1>💬 Mini-Forum Local</h1>
+
+<div id="login-area">
+  <div id="not-logged">
+    <p class="muted">Logare rapidă — datele sunt stocate local în browser.</p>
+    <input id="login-username" placeholder="Username"><br><br>
+    <input id="login-password" placeholder="Parolă" type="password"><br><br>
+    <button id="login-btn">Loghează</button>
+    <button id="show-register-btn" style="background:#2b8a3e">Înregistrează</button>
+    <br><br>
+    <div id="register-area" style="display:none;">
+      <input id="reg-username" placeholder="Alege username"><br><br>
+      <input id="reg-password" placeholder="Parolă" type="password"><br><br>
+      <button id="register-btn">Creează cont</button>
+      <button id="cancel-register" style="background:#888">Anulează</button>
+      <div id="reg-msg" class="muted" style="margin-top:5px;"></div>
+    </div>
   </div>
+  <div id="logged" style="display:none;">
+    <p class="muted">Te-ai logat ca <strong id="me-username"></strong></p>
+    <button id="logout-btn">Deconectează</button>
+    <button id="delete-btn" style="background:#ff6b6b">Șterge cont</button>
+  </div>
+</div>
+
+<div id="forum-area" style="display:none;">
+  <h2>Forum</h2>
+  <input id="new-title" placeholder="Titlu nou topic"><br><br>
+  <textarea id="new-content" placeholder="Scrie mesajul..." rows="3" style="width:100%;"></textarea><br><br>
+  <button id="create-topic-btn">Creează topic</button>
+  <hr>
+  <div id="threads-list"></div>
+</div>
+
+<script>
+/* =========================
+   Utilitare hashing (SHA-256)
+========================= */
+async function sha256Hex(str){
+  const utf8 = new TextEncoder().encode(str);
+  const hash = await crypto.subtle.digest('SHA-256', utf8);
+  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+/* =========================
+   Stocare utilizatori
+========================= */
+const STORAGE_USERS='mf_users_v1';
+const STORAGE_TOPICS='mf_topics_v1';
+
+function loadUsers(){return JSON.parse(localStorage.getItem(STORAGE_USERS)||'{}');}
+function saveUsers(u){localStorage.setItem(STORAGE_USERS,JSON.stringify(u));}
+function loadTopics(){return JSON.parse(localStorage.getItem(STORAGE_TOPICS)||'[]');}
+function saveTopics(t){localStorage.setItem(STORAGE_TOPICS,JSON.stringify(t));}
+
+let currentUser=null;
+
+/* =========================
+   Logare/registrare
+========================= */
+const loginBtn=document.getElementById('login-btn');
+const showRegBtn=document.getElementById('show-register-btn');
+const registerArea=document.getElementById('register-area');
+const registerBtn=document.getElementById('register-btn');
+const cancelRegister=document.getElementById('cancel-register');
+const regMsg=document.getElementById('reg-msg');
+const loginUsername=document.getElementById('login-username');
+const loginPassword=document.getElementById('login-password');
+const regUsername=document.getElementById('reg-username');
+const regPassword=document.getElementById('reg-password');
+const loggedDiv=document.getElementById('logged');
+const notLoggedDiv=document.getElementById('not-logged');
+const meUsernameEl=document.getElementById('me-username');
+const logoutBtn=document.getElementById('logout-btn');
+const deleteBtn=document.getElementById('delete-btn');
+const forumArea=document.getElementById('forum-area');
+const threadsList=document.getElementById('threads-list');
+const newTitle=document.getElementById('new-title');
+const newContent=document.getElementById('new-content');
+const createTopicBtn=document.getElementById('create-topic-btn');
+
+/* Arată înregistrare */
+showRegBtn.addEventListener('click',()=>{registerArea.style.display='block';});
+cancelRegister.addEventListener('click',()=>{registerArea.style.display='none';regMsg.textContent='';});
+
+/* Creează cont */
+registerBtn.addEventListener('click',async ()=>{
+  const u=regUsername.value.trim(),p=regPassword.value;
+  if(!u||!p){regMsg.textContent='Completează username și parolă.';return;}
+  const users=loadUsers();
+  if(users[u]){regMsg.textContent='Username deja folosit.';return;}
+  const hash=await sha256Hex(p);
+  users[u]={passHash:hash};
+  saveUsers(users);
+  regMsg.textContent='Cont creat! Poți să te loghezi.';
+  regUsername.value=''; regPassword.value=''; registerArea.style.display='none';
+});
+
+/* Logare */
+loginBtn.addEventListener('click',async ()=>{
+  const u=loginUsername.value.trim(),p=loginPassword.value;
+  if(!u||!p){alert('Completează ambele câmpuri');return;}
+  const users=loadUsers();
+  if(!users[u]){alert('Utilizator inexistent');return;}
+  const hash=await sha256Hex(p);
+  if(hash!==users[u].passHash){alert('Parolă greșită');return;}
+  currentUser=u; onLogin();
+  loginUsername.value=''; loginPassword.value='';
+});
+
+/* Logout */
+logoutBtn.addEventListener('click',()=>{currentUser=null; onLogout();});
+
+/* Șterge cont */
+deleteBtn.addEventListener('click',()=>{
+  if(!currentUser) return;
+  if(!confirm('Ștergi contul local?')) return;
+  const users=loadUsers(); delete users[currentUser]; saveUsers(users);
+  // Șterge topicurile userului
+  let topics=loadTopics();
+  topics=topics.filter(t=>t.user!==currentUser); saveTopics(topics);
+  currentUser=null; onLogout();
+});
+
+/* =========================
+   Login/Logout UI
+========================= */
+function onLogin(){
+  notLoggedDiv.style.display='none'; loggedDiv.style.display='block';
+  forumArea.style.display='block';
+  meUsernameEl.textContent=currentUser;
+  renderThreads();
+}
+function onLogout(){
+  notLoggedDiv.style.display='block'; loggedDiv.style.display='none';
+  forumArea.style.display='none';
+  meUsernameEl.textContent='';
+}
+
+/* =========================
+   Forum / Topics
+========================= */
+createTopicBtn.addEventListener('click',()=>{
+  const title=newTitle.value.trim();
+  const content=newContent.value.trim();
+  if(!title||!content){alert('Completează titlu și mesaj');return;}
+  const topics=loadTopics();
+  topics.push({user:currentUser,title:title,content:content});
+  saveTopics(topics);
+  newTitle.value=''; newContent.value='';
+  renderThreads();
+});
+
+function renderThreads(){
+  const topics=loadTopics();
+  if(topics.length===0){threadsList.innerHTML='<p>Nu există topic-uri.</p>'; return;}
+  threadsList.innerHTML='';
+  topics.forEach((t,i)=>{
+    const div=document.createElement('div');
+    div.className='thread';
+    div.innerHTML=`<strong>${t.title}</strong> <span class="muted">(${t.user})</span><p>${t.content}</p>
+      <div class="controls">
+        ${t.user===currentUser?`<a onclick="editTopic(${i})">Editează</a>`:''}
+      </div>`;
+    threadsList.appendChild(div);
+  });
+}
+
+/* Edit topic */
+window.editTopic=function(idx){
+  const topics=loadTopics();
+  const t=topics[idx];
+  const newContent=prompt('Editează mesajul:',t.content);
+  if(newContent!==null){
+    topics[idx].content=newContent;
+    saveTopics(topics);
+    renderThreads();
+  }
+}
+
+/* =========================
+   Init
+========================= */
+(function init(){
+  // auto-login last user (optional)
+  const last=localStorage.getItem('mf_last_user');
+  const users=loadUsers();
+  if(last && users[last]){currentUser=last; onLogin();}
+  const origOnLogin=onLogin;
+  onLogin=function(){localStorage.setItem('mf_last_user',currentUser); origOnLogin();}
+})();
+</script>
 </body>
 </html>
+``
