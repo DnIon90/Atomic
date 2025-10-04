@@ -2,243 +2,160 @@
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Joc Tancuri</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Microsoft Office 365</title>
 <style>
-body{font-family:Arial,sans-serif;background:#222;color:#fff;margin:0;padding:20px;}
-h1,h2{color:#ff5722;margin:5px 0;}
-input,button,select{padding:6px;border-radius:5px;border:1px solid #ccc;font-size:14px;}
-button{background:#ff5722;color:#fff;border:0;cursor:pointer;}
-button:hover{background:#e64a19;}
-.muted{color:#ccc;font-size:13px;}
-#login-area,#game-area,#admin-area{margin-bottom:20px;}
-#game-canvas{background:#333;display:block;margin-top:10px;border:2px solid #fff;}
-table{width:100%;border-collapse:collapse;margin-top:10px;}
-table,th,td{border:1px solid #ccc;}
-th,td{padding:6px;text-align:center;}
-.admin-btn{background:#d32f2f;}
+    body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        min-height: 100vh;
+        background-color: #f3f3f3;
+    }
+
+    /* Bara laterală */
+    aside {
+        width: 220px;
+        background-color: #0078d7;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        padding: 20px 0;
+    }
+
+    aside h2 {
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 20px;
+    }
+
+    aside a {
+        color: white;
+        text-decoration: none;
+        padding: 12px 20px;
+        display: block;
+        transition: background 0.3s;
+    }
+
+    aside a:hover {
+        background-color: #005a9e;
+    }
+
+    /* Zona principal */
+    main {
+        flex: 1;
+        padding: 30px;
+    }
+
+    header {
+        background-color: white;
+        padding: 15px 30px;
+        font-size: 24px;
+        font-weight: bold;
+        color: #0078d7;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+
+    .app-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 20px;
+    }
+
+    .app-card {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .app-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+
+    .app-card img {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 12px;
+    }
+
+    .app-card span {
+        font-weight: bold;
+        font-size: 16px;
+        color: #333;
+    }
+
+    footer {
+        text-align: center;
+        padding: 15px;
+        color: #666;
+        margin-top: 40px;
+        font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+        aside {
+            width: 60px;
+        }
+
+        aside h2 {
+            display: none;
+        }
+
+        aside a {
+            text-align: center;
+            padding: 12px 0;
+        }
+
+        main {
+            padding: 20px;
+        }
+    }
 </style>
 </head>
 <body>
-<h1>🛡️ Joc Tancuri</h1>
 
-<div id="login-area">
-  <div id="not-logged">
-    <input id="login-username" placeholder="Username"><br><br>
-    <input id="login-password" placeholder="Parolă" type="password"><br><br>
-    <button id="login-btn">Loghează</button>
-    <button id="show-register-btn" style="background:#4caf50">Înregistrează</button>
-    <div id="register-area" style="display:none;margin-top:10px;">
-      <input id="reg-username" placeholder="Username"><br><br>
-      <input id="reg-password" placeholder="Parolă" type="password"><br><br>
-      <select id="reg-role"><option value="user">User</option><option value="admin">Admin</option></select><br><br>
-      <button id="register-btn">Creează cont</button>
-      <button id="cancel-register" style="background:#888">Anulează</button>
-      <div id="reg-msg" class="muted"></div>
+<aside>
+    <h2>Office</h2>
+    <a href="#"><img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Microsoft_Word_2013_logo.svg" width="24" alt="Word"></a>
+    <a href="#"><img src="https://upload.wikimedia.org/wikipedia/commons/7/73/Microsoft_Excel_2013_logo.svg" width="24" alt="Excel"></a>
+    <a href="#"><img src="https://upload.wikimedia.org/wikipedia/commons/1/1e/Microsoft_PowerPoint_2013_logo.svg" width="24" alt="PowerPoint"></a>
+    <a href="#"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Microsoft_Outlook_2013_logo.svg" width="24" alt="Outlook"></a>
+</aside>
+
+<main>
+    <header>Microsoft Office 365</header>
+
+    <div class="app-grid">
+        <div class="app-card">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Microsoft_Word_2013_logo.svg" alt="Word">
+            <span>Word</span>
+        </div>
+        <div class="app-card">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/7/73/Microsoft_Excel_2013_logo.svg" alt="Excel">
+            <span>Excel</span>
+        </div>
+        <div class="app-card">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/1/1e/Microsoft_PowerPoint_2013_logo.svg" alt="PowerPoint">
+            <span>PowerPoint</span>
+        </div>
+        <div class="app-card">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Microsoft_Outlook_2013_logo.svg" alt="Outlook">
+            <span>Outlook</span>
+        </div>
     </div>
-  </div>
-  <div id="logged" style="display:none;">
-    <p class="muted">Logat ca <strong id="me-username"></strong> (<span id="me-role"></span>)</p>
-    <button id="logout-btn">Deconectează</button>
-  </div>
-</div>
 
-<div id="game-area" style="display:none;">
-  <h2>🎮 Joc Tanc</h2>
-  <div>
-    <button id="upgrade-btn">Upgrade tanc (10 puncte)</button>
-    <div class="muted" id="tank-level">Nivel tanc: 1</div>
-    <div class="muted">Puncte: <span id="points-count">0</span></div>
-  </div>
-  <canvas id="game-canvas" width="600" height="400"></canvas>
-</div>
+    <footer>© 2025 Microsoft Corporation</footer>
+</main>
 
-<div id="admin-area" style="display:none;">
-  <h2>🔧 Panou Administrator</h2>
-  <table>
-    <thead>
-      <tr><th>Username</th><th>Rol</th><th>Puncte</th><th>Tanc Level</th><th>Acțiuni</th></tr>
-    </thead>
-    <tbody id="admin-table"></tbody>
-  </table>
-</div>
-
-<script>
-/* ===== SHA-256 ===== */
-async function sha256Hex(str){
-  const utf8=new TextEncoder().encode(str);
-  const hash=await crypto.subtle.digest('SHA-256',utf8);
-  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-
-/* ===== LocalStorage ===== */
-const STORAGE_USERS='tank_users_v1';
-function loadUsers(){return JSON.parse(localStorage.getItem(STORAGE_USERS)||'{}');}
-function saveUsers(u){localStorage.setItem(STORAGE_USERS,JSON.stringify(u));}
-
-/* ===== UI Elements ===== */
-const loginUsername=document.getElementById('login-username');
-const loginPassword=document.getElementById('login-password');
-const loginBtn=document.getElementById('login-btn');
-const showRegBtn=document.getElementById('show-register-btn');
-const registerArea=document.getElementById('register-area');
-const regUsername=document.getElementById('reg-username');
-const regPassword=document.getElementById('reg-password');
-const regRole=document.getElementById('reg-role');
-const registerBtn=document.getElementById('register-btn');
-const cancelRegister=document.getElementById('cancel-register');
-const regMsg=document.getElementById('reg-msg');
-const notLoggedDiv=document.getElementById('not-logged');
-const loggedDiv=document.getElementById('logged');
-const meUsernameEl=document.getElementById('me-username');
-const meRoleEl=document.getElementById('me-role');
-const logoutBtn=document.getElementById('logout-btn');
-const gameArea=document.getElementById('game-area');
-const adminArea=document.getElementById('admin-area');
-const upgradeBtnEl=document.getElementById('upgrade-btn');
-const tankLevelEl=document.getElementById('tank-level');
-const pointsCountEl=document.getElementById('points-count');
-const adminTable=document.getElementById('admin-table');
-const canvas=document.getElementById('game-canvas');
-const ctx=canvas.getContext('2d');
-
-let currentUser=null;
-let currentRole=null;
-let userData={points:0,tankLevel:1,x:300,y:200};
-let bullets=[];
-
-/* ===== Login / Register ===== */
-showRegBtn.addEventListener('click',()=>{registerArea.style.display='block';});
-cancelRegister.addEventListener('click',()=>{registerArea.style.display='none';regMsg.textContent='';});
-
-registerBtn.addEventListener('click',async()=>{
-  const u=regUsername.value.trim(),p=regPassword.value,role=regRole.value;
-  if(!u||!p){regMsg.textContent='Completează toate câmpurile';return;}
-  const users=loadUsers();
-  if(users[u]){regMsg.textContent='Username deja folosit';return;}
-  const hash=await sha256Hex(p);
-  users[u]={passHash:hash,role:role,points:0,tankLevel:1,x:300,y:200};
-  saveUsers(users);
-  regMsg.textContent='Cont creat! Poți să te loghezi.';
-  regUsername.value=''; regPassword.value='';
-  registerArea.style.display='none';
-});
-
-loginBtn.addEventListener('click',async()=>{
-  const u=loginUsername.value.trim(),p=loginPassword.value;
-  if(!u||!p){alert('Completează username și parolă');return;}
-  const users=loadUsers();
-  if(!users[u]){alert('Utilizator inexistent');return;}
-  const hash=await sha256Hex(p);
-  if(hash!==users[u].passHash){alert('Parolă greșită');return;}
-  currentUser=u;
-  currentRole=users[u].role;
-  userData=JSON.parse(JSON.stringify(users[u]));
-  onLogin();
-  loginUsername.value=''; loginPassword.value='';
-});
-
-logoutBtn.addEventListener('click',()=>{currentUser=null; currentRole=null; onLogout();});
-
-/* ===== Login / Logout UI ===== */
-function onLogin(){
-  notLoggedDiv.style.display='none';
-  loggedDiv.style.display='block';
-  gameArea.style.display='block';
-  meUsernameEl.textContent=currentUser;
-  meRoleEl.textContent=currentRole;
-  updateUI();
-  if(currentRole==='admin'){adminArea.style.display='block'; renderAdminTable();}
-  requestAnimationFrame(gameLoop);
-}
-
-function onLogout(){
-  notLoggedDiv.style.display='block';
-  loggedDiv.style.display='none';
-  gameArea.style.display='none';
-  adminArea.style.display='none';
-  meUsernameEl.textContent='';
-  meRoleEl.textContent='';
-}
-
-/* ===== Game Logic ===== */
-let keys={};
-document.addEventListener('keydown',e=>{keys[e.key]=true; if(e.key===' ') shootBullet();});
-document.addEventListener('keyup',e=>{keys[e.key]=false;});
-
-function shootBullet(){
-  bullets.push({x:userData.x+15,y:userData.y+15,dx:0,dy:-5});
-}
-
-function updateUI(){
-  tankLevelEl.textContent='Nivel tanc: '+userData.tankLevel;
-  pointsCountEl.textContent=userData.points;
-}
-
-function saveUserData(){
-  const users=loadUsers();
-  if(!currentUser) return;
-  users[currentUser]=JSON.parse(JSON.stringify(userData));
-  saveUsers(users);
-}
-
-/* Upgrade tank */
-upgradeBtnEl.addEventListener('click',()=>{
-  const cost=10;
-  if(userData.points>=cost){
-    userData.points-=cost;
-    userData.tankLevel+=1;
-    updateUI();
-    saveUserData();
-  } else alert('Nu ai suficiente puncte');
-});
-
-/* Game loop */
-function gameLoop(){
-  // movement
-  if(keys['ArrowLeft']) userData.x-=3;
-  if(keys['ArrowRight']) userData.x+=3;
-  if(keys['ArrowUp']) userData.y-=3;
-  if(keys['ArrowDown']) userData.y+=3;
-  userData.x=Math.max(0,Math.min(canvas.width-30,userData.x));
-  userData.y=Math.max(0,Math.min(canvas.height-30,userData.y));
-
-  // bullets
-  bullets.forEach(b=>{b.y+=b.dy; b.x+=b.dx;});
-  bullets=bullets.filter(b=>b.y>0);
-
-  // random points appear
-  if(Math.random()<0.01){userData.points+=1; updateUI(); saveUserData();}
-
-  // draw
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  // tank
-  ctx.fillStyle='blue';
-  ctx.fillRect(userData.x,userData.y,30,30);
-  // bullets
-  ctx.fillStyle='yellow';
-  bullets.forEach(b=>ctx.fillRect(b.x,b.y,5,10));
-
-  requestAnimationFrame(gameLoop);
-}
-
-/* ===== Admin ===== */
-function renderAdminTable(){
-  adminTable.innerHTML='';
-  const users=loadUsers();
-  Object.keys(users).forEach(u=>{
-    const us=users[u];
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${u}</td><td>${us.role}</td><td>${us.points}</td><td>${us.tankLevel}</td>
-    <td>${u!==currentUser?`<button class="admin-btn" onclick="deleteUser('${u}')">Șterge</button>`:''}</td>`;
-    adminTable.appendChild(tr);
-  });
-}
-
-window.deleteUser=function(u){
-  if(!confirm('Ștergi utilizatorul '+u+'?')) return;
-  const users=loadUsers(); delete users[u]; saveUsers(users); renderAdminTable();
-}
-</script>
 </body>
 </html>
