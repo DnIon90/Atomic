@@ -1,52 +1,37 @@
 @echo off
 REM ============================================================
-REM   XMRig CPU Miner – Mod sigur + Log automat
+REM   XMRig CPU Miner – Versiune debug (CMD nu se închide)
 REM ============================================================
 
-REM 👉 Introdu adresa portofelului tău Monero (începe cu 4 sau 44…)
+REM Introdu adresa portofelului tău Monero
 set WALLET=44SrzvrFJH1NuK9HkD1aSURdt9xQchmg8BeMTF7xxws39nirMwM9dfoUvmpdcuPsPRZdy1FZuVeH36enbpk97essByLKy7T
 
-REM 👉 Pool recomandat
+REM Pool recomandat
 set POOL=pool.minexmr.com:4444
 
-REM 👉 Prioritatea CPU (1 = minim, 10 = maxim)
+REM Prioritatea CPU
 set CPU_PRIORITY=2
 
-REM 👉 Temperatura maximă CPU (°C)
-set MAX_TEMP=85
-
-REM 👉 Fișier de log
-set LOG_FILE=miner_log.txt
-
 echo --------------------------------------------
-echo   Pornire miner XMRig (Mod Sigur + Log)
-echo   Pool: %POOL%
-echo   Oprire automată la %MAX_TEMP%°C
-echo   Log scris în %LOG_FILE%
+echo Pornire miner XMRig (Mod Debug)
 echo --------------------------------------------
 echo.
 
-:loop
-REM --- Citeste temperatura CPU
-for /f "tokens=2 delims==." %%T in ('wmic /namespace:\\root\wmi PATH MSAcpi_ThermalZoneTemperature get CurrentTemperature /value 2^>nul') do (
-    set /a TEMP_C=%%T/10-273
-)
-
-if "%TEMP_C%"=="" (
-    set TEMP_C=NA
-)
-
-if NOT "%TEMP_C%"=="NA" if %TEMP_C% GEQ %MAX_TEMP% (
-    echo [%date% %time%] [ALERT] Temperatura CPU = %TEMP_C%C. Miner oprit pentru protecție! >> %LOG_FILE%
-    echo [ALERT] Temperatura CPU = %TEMP_C%C. Miner oprit pentru protecție!
+REM Verifică dacă xmrig.exe există
+if not exist xmrig.exe (
+    echo [EROARE] xmrig.exe nu a fost gasit in acest folder!
+    echo Pune xmrig.exe in acelasi folder cu acest .bat
     pause
     exit
 )
 
-REM --- Rulează minerul și scrie log
-echo [%date% %time%] Pornire job miner. Temp CPU=%TEMP_C%C >> %LOG_FILE%
-xmrig.exe --url %POOL% --user %WALLET% --donate-level 0 --cpu-priority %CPU_PRIORITY% --coin monero >> %LOG_FILE% 2>&1
+REM Pornește minerul și prinde eventualele erori
+echo Pornire miner...
+xmrig.exe --url %POOL% --user %WALLET% --donate-level 0 --cpu-priority %CPU_PRIORITY% --coin monero
+if errorlevel 1 (
+    echo [EROARE] Minerul s-a oprit cu cod de eroare %errorlevel%
+)
 
-REM --- Asteapta 5 secunde inainte de a verifica temperatura din nou
-timeout /t 5 >nul
-goto loop
+echo.
+echo Apasa orice tasta pentru a inchide CMD.
+pause
