@@ -1,14 +1,22 @@
 @echo off
-REM ---44SrzvrFJH1NuK9HkD1aSURdt9xQchmg8BeMTF7xxws39nirMwM9dfoUvmpdcuPsPRZdy1FZuVeH36enbpk97essByLKy7T
+REM ============================================================
+REM   XMRig CPU Miner - fișier complet
+REM ============================================================
+
+REM 👉 Introdu aici adresa portofelului tău Monero
 set WALLET=44SrzvrFJH1NuK9HkD1aSURdt9xQchmg8BeMTF7xxws39nirMwM9dfoUvmpdcuPsPRZdy1FZuVeH36enbpk97essByLKy7T
+
+REM 👉 Pool recomandat
 set POOL=pool.minexmr.com:4444
+
+REM 👉 Prioritatea CPU (1 = minim, 10 = maxim)
 set CPU_PRIORITY=2
 
 echo Pornire miner XMRig...
+echo.
+
+REM ====== Linia care pornește minerul ======
 xmrig.exe --url %POOL% --user %WALLET% --cpu-priority %CPU_PRIORITY%
+
+REM ====== Linia care ține CMD deschis ======
 pause
-
-
-
-
-86Z3PUZTUShDqhNfr6hy6tSW5NtiKVZr9RQ6PgqF5QkBcSrCZbyNv5ZjV6hGUZscW68QRq3WgPFfEVzv4FvxYS2USEPyMWu
