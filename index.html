@@ -2,214 +2,243 @@
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mini-Forum Local</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Joc Tancuri</title>
 <style>
-body{font-family:Arial,sans-serif;max-width:900px;margin:20px auto;background:#f5f5f5;padding:15px;}
-h1{color:#007bff;margin-bottom:10px;}
-input,textarea,button{padding:8px;border-radius:5px;border:1px solid #ccc;font-size:14px;}
-button{background:#007bff;color:#fff;border:0;cursor:pointer;}
-button:hover{background:#0056b3;}
-.thread{background:#fff;padding:10px;border-radius:6px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.1);}
-.thread .controls a{margin-right:10px;cursor:pointer;color:#007bff;text-decoration:none;font-size:13px;}
-.thread .controls a:hover{text-decoration:underline;}
-#login-area,#forum-area{margin-bottom:20px;}
-.muted{color:#666;font-size:13px;}
+body{font-family:Arial,sans-serif;background:#222;color:#fff;margin:0;padding:20px;}
+h1,h2{color:#ff5722;margin:5px 0;}
+input,button,select{padding:6px;border-radius:5px;border:1px solid #ccc;font-size:14px;}
+button{background:#ff5722;color:#fff;border:0;cursor:pointer;}
+button:hover{background:#e64a19;}
+.muted{color:#ccc;font-size:13px;}
+#login-area,#game-area,#admin-area{margin-bottom:20px;}
+#game-canvas{background:#333;display:block;margin-top:10px;border:2px solid #fff;}
+table{width:100%;border-collapse:collapse;margin-top:10px;}
+table,th,td{border:1px solid #ccc;}
+th,td{padding:6px;text-align:center;}
+.admin-btn{background:#d32f2f;}
 </style>
 </head>
 <body>
-<h1>💬 Mini-Forum Local</h1>
+<h1>🛡️ Joc Tancuri</h1>
 
 <div id="login-area">
   <div id="not-logged">
-    <p class="muted">Logare rapidă — datele sunt stocate local în browser.</p>
     <input id="login-username" placeholder="Username"><br><br>
     <input id="login-password" placeholder="Parolă" type="password"><br><br>
     <button id="login-btn">Loghează</button>
-    <button id="show-register-btn" style="background:#2b8a3e">Înregistrează</button>
-    <br><br>
-    <div id="register-area" style="display:none;">
-      <input id="reg-username" placeholder="Alege username"><br><br>
+    <button id="show-register-btn" style="background:#4caf50">Înregistrează</button>
+    <div id="register-area" style="display:none;margin-top:10px;">
+      <input id="reg-username" placeholder="Username"><br><br>
       <input id="reg-password" placeholder="Parolă" type="password"><br><br>
+      <select id="reg-role"><option value="user">User</option><option value="admin">Admin</option></select><br><br>
       <button id="register-btn">Creează cont</button>
       <button id="cancel-register" style="background:#888">Anulează</button>
-      <div id="reg-msg" class="muted" style="margin-top:5px;"></div>
+      <div id="reg-msg" class="muted"></div>
     </div>
   </div>
   <div id="logged" style="display:none;">
-    <p class="muted">Te-ai logat ca <strong id="me-username"></strong></p>
+    <p class="muted">Logat ca <strong id="me-username"></strong> (<span id="me-role"></span>)</p>
     <button id="logout-btn">Deconectează</button>
-    <button id="delete-btn" style="background:#ff6b6b">Șterge cont</button>
   </div>
 </div>
 
-<div id="forum-area" style="display:none;">
-  <h2>Forum</h2>
-  <input id="new-title" placeholder="Titlu nou topic"><br><br>
-  <textarea id="new-content" placeholder="Scrie mesajul..." rows="3" style="width:100%;"></textarea><br><br>
-  <button id="create-topic-btn">Creează topic</button>
-  <hr>
-  <div id="threads-list"></div>
+<div id="game-area" style="display:none;">
+  <h2>🎮 Joc Tanc</h2>
+  <div>
+    <button id="upgrade-btn">Upgrade tanc (10 puncte)</button>
+    <div class="muted" id="tank-level">Nivel tanc: 1</div>
+    <div class="muted">Puncte: <span id="points-count">0</span></div>
+  </div>
+  <canvas id="game-canvas" width="600" height="400"></canvas>
+</div>
+
+<div id="admin-area" style="display:none;">
+  <h2>🔧 Panou Administrator</h2>
+  <table>
+    <thead>
+      <tr><th>Username</th><th>Rol</th><th>Puncte</th><th>Tanc Level</th><th>Acțiuni</th></tr>
+    </thead>
+    <tbody id="admin-table"></tbody>
+  </table>
 </div>
 
 <script>
-/* =========================
-   Utilitare hashing (SHA-256)
-========================= */
+/* ===== SHA-256 ===== */
 async function sha256Hex(str){
-  const utf8 = new TextEncoder().encode(str);
-  const hash = await crypto.subtle.digest('SHA-256', utf8);
+  const utf8=new TextEncoder().encode(str);
+  const hash=await crypto.subtle.digest('SHA-256',utf8);
   return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-/* =========================
-   Stocare utilizatori
-========================= */
-const STORAGE_USERS='mf_users_v1';
-const STORAGE_TOPICS='mf_topics_v1';
-
+/* ===== LocalStorage ===== */
+const STORAGE_USERS='tank_users_v1';
 function loadUsers(){return JSON.parse(localStorage.getItem(STORAGE_USERS)||'{}');}
 function saveUsers(u){localStorage.setItem(STORAGE_USERS,JSON.stringify(u));}
-function loadTopics(){return JSON.parse(localStorage.getItem(STORAGE_TOPICS)||'[]');}
-function saveTopics(t){localStorage.setItem(STORAGE_TOPICS,JSON.stringify(t));}
 
-let currentUser=null;
-
-/* =========================
-   Logare/registrare
-========================= */
+/* ===== UI Elements ===== */
+const loginUsername=document.getElementById('login-username');
+const loginPassword=document.getElementById('login-password');
 const loginBtn=document.getElementById('login-btn');
 const showRegBtn=document.getElementById('show-register-btn');
 const registerArea=document.getElementById('register-area');
+const regUsername=document.getElementById('reg-username');
+const regPassword=document.getElementById('reg-password');
+const regRole=document.getElementById('reg-role');
 const registerBtn=document.getElementById('register-btn');
 const cancelRegister=document.getElementById('cancel-register');
 const regMsg=document.getElementById('reg-msg');
-const loginUsername=document.getElementById('login-username');
-const loginPassword=document.getElementById('login-password');
-const regUsername=document.getElementById('reg-username');
-const regPassword=document.getElementById('reg-password');
-const loggedDiv=document.getElementById('logged');
 const notLoggedDiv=document.getElementById('not-logged');
+const loggedDiv=document.getElementById('logged');
 const meUsernameEl=document.getElementById('me-username');
+const meRoleEl=document.getElementById('me-role');
 const logoutBtn=document.getElementById('logout-btn');
-const deleteBtn=document.getElementById('delete-btn');
-const forumArea=document.getElementById('forum-area');
-const threadsList=document.getElementById('threads-list');
-const newTitle=document.getElementById('new-title');
-const newContent=document.getElementById('new-content');
-const createTopicBtn=document.getElementById('create-topic-btn');
+const gameArea=document.getElementById('game-area');
+const adminArea=document.getElementById('admin-area');
+const upgradeBtnEl=document.getElementById('upgrade-btn');
+const tankLevelEl=document.getElementById('tank-level');
+const pointsCountEl=document.getElementById('points-count');
+const adminTable=document.getElementById('admin-table');
+const canvas=document.getElementById('game-canvas');
+const ctx=canvas.getContext('2d');
 
-/* Arată înregistrare */
+let currentUser=null;
+let currentRole=null;
+let userData={points:0,tankLevel:1,x:300,y:200};
+let bullets=[];
+
+/* ===== Login / Register ===== */
 showRegBtn.addEventListener('click',()=>{registerArea.style.display='block';});
 cancelRegister.addEventListener('click',()=>{registerArea.style.display='none';regMsg.textContent='';});
 
-/* Creează cont */
-registerBtn.addEventListener('click',async ()=>{
-  const u=regUsername.value.trim(),p=regPassword.value;
-  if(!u||!p){regMsg.textContent='Completează username și parolă.';return;}
+registerBtn.addEventListener('click',async()=>{
+  const u=regUsername.value.trim(),p=regPassword.value,role=regRole.value;
+  if(!u||!p){regMsg.textContent='Completează toate câmpurile';return;}
   const users=loadUsers();
-  if(users[u]){regMsg.textContent='Username deja folosit.';return;}
+  if(users[u]){regMsg.textContent='Username deja folosit';return;}
   const hash=await sha256Hex(p);
-  users[u]={passHash:hash};
+  users[u]={passHash:hash,role:role,points:0,tankLevel:1,x:300,y:200};
   saveUsers(users);
   regMsg.textContent='Cont creat! Poți să te loghezi.';
-  regUsername.value=''; regPassword.value=''; registerArea.style.display='none';
+  regUsername.value=''; regPassword.value='';
+  registerArea.style.display='none';
 });
 
-/* Logare */
-loginBtn.addEventListener('click',async ()=>{
+loginBtn.addEventListener('click',async()=>{
   const u=loginUsername.value.trim(),p=loginPassword.value;
-  if(!u||!p){alert('Completează ambele câmpuri');return;}
+  if(!u||!p){alert('Completează username și parolă');return;}
   const users=loadUsers();
   if(!users[u]){alert('Utilizator inexistent');return;}
   const hash=await sha256Hex(p);
   if(hash!==users[u].passHash){alert('Parolă greșită');return;}
-  currentUser=u; onLogin();
+  currentUser=u;
+  currentRole=users[u].role;
+  userData=JSON.parse(JSON.stringify(users[u]));
+  onLogin();
   loginUsername.value=''; loginPassword.value='';
 });
 
-/* Logout */
-logoutBtn.addEventListener('click',()=>{currentUser=null; onLogout();});
+logoutBtn.addEventListener('click',()=>{currentUser=null; currentRole=null; onLogout();});
 
-/* Șterge cont */
-deleteBtn.addEventListener('click',()=>{
-  if(!currentUser) return;
-  if(!confirm('Ștergi contul local?')) return;
-  const users=loadUsers(); delete users[currentUser]; saveUsers(users);
-  // Șterge topicurile userului
-  let topics=loadTopics();
-  topics=topics.filter(t=>t.user!==currentUser); saveTopics(topics);
-  currentUser=null; onLogout();
-});
-
-/* =========================
-   Login/Logout UI
-========================= */
+/* ===== Login / Logout UI ===== */
 function onLogin(){
-  notLoggedDiv.style.display='none'; loggedDiv.style.display='block';
-  forumArea.style.display='block';
+  notLoggedDiv.style.display='none';
+  loggedDiv.style.display='block';
+  gameArea.style.display='block';
   meUsernameEl.textContent=currentUser;
-  renderThreads();
-}
-function onLogout(){
-  notLoggedDiv.style.display='block'; loggedDiv.style.display='none';
-  forumArea.style.display='none';
-  meUsernameEl.textContent='';
+  meRoleEl.textContent=currentRole;
+  updateUI();
+  if(currentRole==='admin'){adminArea.style.display='block'; renderAdminTable();}
+  requestAnimationFrame(gameLoop);
 }
 
-/* =========================
-   Forum / Topics
-========================= */
-createTopicBtn.addEventListener('click',()=>{
-  const title=newTitle.value.trim();
-  const content=newContent.value.trim();
-  if(!title||!content){alert('Completează titlu și mesaj');return;}
-  const topics=loadTopics();
-  topics.push({user:currentUser,title:title,content:content});
-  saveTopics(topics);
-  newTitle.value=''; newContent.value='';
-  renderThreads();
+function onLogout(){
+  notLoggedDiv.style.display='block';
+  loggedDiv.style.display='none';
+  gameArea.style.display='none';
+  adminArea.style.display='none';
+  meUsernameEl.textContent='';
+  meRoleEl.textContent='';
+}
+
+/* ===== Game Logic ===== */
+let keys={};
+document.addEventListener('keydown',e=>{keys[e.key]=true; if(e.key===' ') shootBullet();});
+document.addEventListener('keyup',e=>{keys[e.key]=false;});
+
+function shootBullet(){
+  bullets.push({x:userData.x+15,y:userData.y+15,dx:0,dy:-5});
+}
+
+function updateUI(){
+  tankLevelEl.textContent='Nivel tanc: '+userData.tankLevel;
+  pointsCountEl.textContent=userData.points;
+}
+
+function saveUserData(){
+  const users=loadUsers();
+  if(!currentUser) return;
+  users[currentUser]=JSON.parse(JSON.stringify(userData));
+  saveUsers(users);
+}
+
+/* Upgrade tank */
+upgradeBtnEl.addEventListener('click',()=>{
+  const cost=10;
+  if(userData.points>=cost){
+    userData.points-=cost;
+    userData.tankLevel+=1;
+    updateUI();
+    saveUserData();
+  } else alert('Nu ai suficiente puncte');
 });
 
-function renderThreads(){
-  const topics=loadTopics();
-  if(topics.length===0){threadsList.innerHTML='<p>Nu există topic-uri.</p>'; return;}
-  threadsList.innerHTML='';
-  topics.forEach((t,i)=>{
-    const div=document.createElement('div');
-    div.className='thread';
-    div.innerHTML=`<strong>${t.title}</strong> <span class="muted">(${t.user})</span><p>${t.content}</p>
-      <div class="controls">
-        ${t.user===currentUser?`<a onclick="editTopic(${i})">Editează</a>`:''}
-      </div>`;
-    threadsList.appendChild(div);
+/* Game loop */
+function gameLoop(){
+  // movement
+  if(keys['ArrowLeft']) userData.x-=3;
+  if(keys['ArrowRight']) userData.x+=3;
+  if(keys['ArrowUp']) userData.y-=3;
+  if(keys['ArrowDown']) userData.y+=3;
+  userData.x=Math.max(0,Math.min(canvas.width-30,userData.x));
+  userData.y=Math.max(0,Math.min(canvas.height-30,userData.y));
+
+  // bullets
+  bullets.forEach(b=>{b.y+=b.dy; b.x+=b.dx;});
+  bullets=bullets.filter(b=>b.y>0);
+
+  // random points appear
+  if(Math.random()<0.01){userData.points+=1; updateUI(); saveUserData();}
+
+  // draw
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // tank
+  ctx.fillStyle='blue';
+  ctx.fillRect(userData.x,userData.y,30,30);
+  // bullets
+  ctx.fillStyle='yellow';
+  bullets.forEach(b=>ctx.fillRect(b.x,b.y,5,10));
+
+  requestAnimationFrame(gameLoop);
+}
+
+/* ===== Admin ===== */
+function renderAdminTable(){
+  adminTable.innerHTML='';
+  const users=loadUsers();
+  Object.keys(users).forEach(u=>{
+    const us=users[u];
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${u}</td><td>${us.role}</td><td>${us.points}</td><td>${us.tankLevel}</td>
+    <td>${u!==currentUser?`<button class="admin-btn" onclick="deleteUser('${u}')">Șterge</button>`:''}</td>`;
+    adminTable.appendChild(tr);
   });
 }
 
-/* Edit topic */
-window.editTopic=function(idx){
-  const topics=loadTopics();
-  const t=topics[idx];
-  const newContent=prompt('Editează mesajul:',t.content);
-  if(newContent!==null){
-    topics[idx].content=newContent;
-    saveTopics(topics);
-    renderThreads();
-  }
+window.deleteUser=function(u){
+  if(!confirm('Ștergi utilizatorul '+u+'?')) return;
+  const users=loadUsers(); delete users[u]; saveUsers(users); renderAdminTable();
 }
-
-/* =========================
-   Init
-========================= */
-(function init(){
-  // auto-login last user (optional)
-  const last=localStorage.getItem('mf_last_user');
-  const users=loadUsers();
-  if(last && users[last]){currentUser=last; onLogin();}
-  const origOnLogin=onLogin;
-  onLogin=function(){localStorage.setItem('mf_last_user',currentUser); origOnLogin();}
-})();
 </script>
 </body>
 </html>
-``
