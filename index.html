@@ -1,1 +1,16 @@
-xmrig.exe --url pool.minexmr.com:4444 --user 859ajxBbdRFcrMmZFjP8eDhhXnrDYcz2FW3Qoi4vRvReMiKDY7rtkPM8zfucjx9Mmdisb5vF41MaNQM3oWmUmudj54c6faV --donate-level 0 --threads 2 --cpu-priority 2 >> miner_log.txt 2>&1
+@echo off
+REM -----------------------------
+REM Test CPU hashing – Bitcoin style
+REM -----------------------------
+setlocal enabledelayedexpansion
+
+echo Pornire test CPU hash...
+set /a count=0
+
+:loop
+set /a count+=1
+REM Simulează hash – calculează un număr random
+set /a hash=!random! * !random!
+echo Hash !count!: !hash!
+timeout /t 0 >nul
+goto loop
