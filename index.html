@@ -3,139 +3,96 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Microsoft Office 365</title>
+<title>Microsoft Office Simplu</title>
 <style>
     body {
         margin: 0;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        font-family: Arial, sans-serif;
         display: flex;
         min-height: 100vh;
         background-color: #f3f3f3;
     }
 
-    /* Bara laterală */
     aside {
-        width: 220px;
+        width: 200px;
         background-color: #0078d7;
         color: white;
-        display: flex;
-        flex-direction: column;
-        padding: 20px 0;
+        padding: 20px;
     }
 
     aside h2 {
         text-align: center;
-        margin-bottom: 30px;
-        font-size: 20px;
+        margin-bottom: 20px;
+        font-size: 18px;
     }
 
     aside a {
+        display: block;
         color: white;
         text-decoration: none;
-        padding: 12px 20px;
-        display: block;
-        transition: background 0.3s;
+        padding: 10px 0;
     }
 
-    aside a:hover {
-        background-color: #005a9e;
-    }
-
-    /* Zona principal */
     main {
         flex: 1;
-        padding: 30px;
+        padding: 20px;
     }
 
     header {
         background-color: white;
-        padding: 15px 30px;
-        font-size: 24px;
+        padding: 15px;
+        font-size: 22px;
         font-weight: bold;
         color: #0078d7;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin-bottom: 30px;
-        border-radius: 8px;
+        margin-bottom: 20px;
+        border-radius: 5px;
     }
 
     .app-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
     }
 
     .app-card {
         background-color: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
+        border-radius: 10px;
+        padding: 15px;
+        flex: 1 1 120px;
         text-align: center;
         cursor: pointer;
-        transition: transform 0.3s, box-shadow 0.3s;
         opacity: 0;
-        transform: translateY(20px);
-        animation: fadeInUp 0.6s forwards;
+        transform: translateY(15px);
+        animation: fadeIn 0.5s forwards;
     }
 
-    /* Stagger animation for multiple cards */
     .app-card:nth-child(1) { animation-delay: 0.1s; }
     .app-card:nth-child(2) { animation-delay: 0.2s; }
     .app-card:nth-child(3) { animation-delay: 0.3s; }
     .app-card:nth-child(4) { animation-delay: 0.4s; }
 
-    @keyframes fadeInUp {
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .app-card:hover {
-        transform: translateY(-5px) scale(1.05);
-        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    @keyframes fadeIn {
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .app-card img {
-        width: 40px; /* micșorat */
-        height: 40px;
-        margin-bottom: 12px;
+        width: 35px;
+        height: 35px;
+        margin-bottom: 8px;
     }
 
     .app-card span {
+        display: block;
+        font-size: 14px;
         font-weight: bold;
-        font-size: 14px; /* mai mic text */
         color: #333;
     }
 
     footer {
         text-align: center;
-        padding: 15px;
+        padding: 10px;
         color: #666;
-        margin-top: 40px;
-        font-size: 14px;
-    }
-
-    @media (max-width: 768px) {
-        aside {
-            width: 60px;
-        }
-
-        aside h2 {
-            display: none;
-        }
-
-        aside a {
-            text-align: center;
-            padding: 12px 0;
-        }
-
-        main {
-            padding: 20px;
-        }
+        font-size: 13px;
     }
 </style>
 </head>
@@ -143,35 +100,33 @@
 
 <aside>
     <h2>Office</h2>
-    <a href="#"><img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Microsoft_Word_2013_logo.svg" width="20" alt="Word"></a>
-    <a href="#"><img src="https://upload.wikimedia.org/wikipedia/commons/7/73/Microsoft_Excel_2013_logo.svg" width="20" alt="Excel"></a>
-    <a href="#"><img src="https://upload.wikimedia.org/wikipedia/commons/1/1e/Microsoft_PowerPoint_2013_logo.svg" width="20" alt="PowerPoint"></a>
-    <a href="#"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Microsoft_Outlook_2013_logo.svg" width="20" alt="Outlook"></a>
+    <a href="#">Word</a>
+    <a href="#">Excel</a>
+    <a href="#">PowerPoint</a>
+    <a href="#">Outlook</a>
 </aside>
 
 <main>
-    <header>Microsoft Office 365</header>
-
+    <header>Microsoft Office</header>
     <div class="app-grid">
         <div class="app-card">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Microsoft_Word_2013_logo.svg" alt="Word">
+            <img src="https://via.placeholder.com/35?text=W" alt="Word">
             <span>Word</span>
         </div>
         <div class="app-card">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/7/73/Microsoft_Excel_2013_logo.svg" alt="Excel">
+            <img src="https://via.placeholder.com/35?text=E" alt="Excel">
             <span>Excel</span>
         </div>
         <div class="app-card">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/1/1e/Microsoft_PowerPoint_2013_logo.svg" alt="PowerPoint">
+            <img src="https://via.placeholder.com/35?text=P" alt="PowerPoint">
             <span>PowerPoint</span>
         </div>
         <div class="app-card">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Microsoft_Outlook_2013_logo.svg" alt="Outlook">
+            <img src="https://via.placeholder.com/35?text=O" alt="Outlook">
             <span>Outlook</span>
         </div>
     </div>
-
-    <footer>© 2025 Microsoft Corporation</footer>
+    <footer>© 2025 Microsoft</footer>
 </main>
 
 </body>
