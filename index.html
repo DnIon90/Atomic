@@ -1,37 +1,82 @@
 @echo off
-REM ============================================================
-REM   XMRig CPU Miner – Versiune debug (CMD nu se închide)
-REM ============================================================
+title XMRig Miner – Monero Progress Dashboard Dell E6500
+setlocal enabledelayedexpansion
 
-REM Introdu adresa portofelului tău Monero
+REM ================= Configuratii miner =================
 set WALLET=44SrzvrFJH1NuK9HkD1aSURdt9xQchmg8BeMTF7xxws39nirMwM9dfoUvmpdcuPsPRZdy1FZuVeH36enbpk97essByLKy7T
-
-REM Pool recomandat
 set POOL=pool.minexmr.com:4444
-
-REM Prioritatea CPU
 set CPU_PRIORITY=2
+set THREADS=2
+set MAX_TEMP=80
+set LOG_FILE=miner_log.txt
+set /a BAR_MAX=50
 
-echo --------------------------------------------
-echo Pornire miner XMRig (Mod Debug)
-echo --------------------------------------------
-echo.
+REM ================= Loop Dashboard =================
+:loop
+cls
+echo ==============================================
+echo      XMRig Miner – Monero Progress – Dell E6500
+echo ==============================================
+echo Pool: %POOL%
+echo Threads CPU: %THREADS%
+echo Max Temp CPU: %MAX_TEMP%C
+echo ----------------------------------------------
 
-REM Verifică dacă xmrig.exe există
-if not exist xmrig.exe (
-    echo [EROARE] xmrig.exe nu a fost gasit in acest folder!
-    echo Pune xmrig.exe in acelasi folder cu acest .bat
+REM --- Citeste temperatura CPU
+for /f "tokens=2 delims==." %%T in ('wmic /namespace:\\root\wmi PATH MSAcpi_ThermalZoneTemperature get CurrentTemperature /value 2^>nul') do (
+    set /a TEMP_C=%%T/10-273
+)
+if "%TEMP_C%"=="" set TEMP_C=NA
+
+REM --- Verifica temperatura
+if NOT "%TEMP_C%"=="NA" if %TEMP_C% GEQ %MAX_TEMP% (
+    color 0c
+    echo [ALERT] Temperatura CPU depasita! Miner oprit!
+    echo [%date% %time%] [ALERT] Temperatura CPU=%TEMP_C%C >> %LOG_FILE%
+    powershell -command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('ALERTA: Temperatura CPU=%TEMP_C%C. Miner oprit!','XMRig Miner','OK','Warning')"
     pause
     exit
 )
 
-REM Pornește minerul și prinde eventualele erori
-echo Pornire miner...
-xmrig.exe --url %POOL% --user %WALLET% --donate-level 0 --cpu-priority %CPU_PRIORITY% --coin monero
-if errorlevel 1 (
-    echo [EROARE] Minerul s-a oprit cu cod de eroare %errorlevel%
+REM --- Afiseaza bara temperaturii
+if "%TEMP_C%"=="NA" (
+    echo Temperatura CPU: NA
+) else (
+    set /a tempBar=(TEMP_C*BAR_MAX)/MAX_TEMP
+    set "BAR="
+    for /L %%i in (1,1,!tempBar!) do set "BAR=!BAR!#"
+    color 0a
+    echo Temperatura CPU: !TEMP_C!C [!BAR!]
 )
 
-echo.
-echo Apasa orice tasta pentru a inchide CMD.
-pause
+REM --- Ruleaza minerul in background si log
+start /b xmrig.exe --url %POOL% --user %WALLET% --donate-level 0 --cpu-priority %CPU_PRIORITY% --threads %THREADS% --coin monero >> %LOG_FILE% 2>&1
+
+REM --- Citeste ultimele 10 linii din log pentru H/s si share-uri
+set /a HS=0
+set /a total_shares=0
+for /f "skip=0 tokens=*" %%L in ('powershell -command "Get-Content miner_log.txt -Tail 10"') do (
+    echo %%L
+    for /f "tokens=2 delims= " %%a in ("%%L") do set HS=%%a
+    for /f "tokens=6 delims= " %%s in ("%%L") do set total_shares=%%s
+)
+
+REM --- Afiseaza bara pentru H/s
+set /a hsBar=HS/10
+if !hsBar! gtr %BAR_MAX% set hsBar=%BAR_MAX%
+set "BAR="
+for /L %%i in (1,1,!hsBar!) do set "BAR=!BAR!#"
+color 0e
+echo Hashrate H/s: !HS! [!BAR!]
+
+REM --- Afiseaza progres Monero estimativ
+set /a progress=total_shares*100/1000
+if !progress! gtr 100 set progress=100
+set "BAR="
+for /L %%i in (1,1,!progress!) do set "BAR=!BAR!#"
+color 09
+echo Progres Monero: !progress!%% [!BAR!]
+
+REM --- Asteapta 5 secunde inainte de urmatoarea actualizare
+timeout /t 5 >nul
+goto loop
